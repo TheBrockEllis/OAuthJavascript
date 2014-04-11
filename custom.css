@@ -1,5 +1,6 @@
 body {
     padding-top: 50px;
+    font-family: 'Open Sans', sans-serif;
 }
 
 .logged {
@@ -22,4 +23,16 @@ body {
 pre {
     margin: 25px;
     display: none;
+}
+
+ul {
+    list-style: none;
+    list-style-type: none;
+}
+
+li {
+    font-size: 18px;
+    margin: 15px 0px;
+    padding: 0px;
+    width: 100%;
 }

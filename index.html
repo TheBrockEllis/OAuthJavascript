@@ -3,10 +3,12 @@
     <meta charset="utf-8">
     <title>WhatsForLunch?</title>
     <link rel="stylesheet" href="http://netdna.bootstrapcdn.com/bootstrap/3.0.3/css/bootstrap.min.css">
-    <!--<link rel="stylesheet" href="http://netdna.bootstrapcdn.com/bootstrap/3.0.3/css/bootstrap-theme.min.css">-->
+    <link href='http://fonts.googleapis.com/css?family=Open+Sans' rel='stylesheet' type='text/css' />
     <link rel="stylesheet" href="custom.css" />
 </head>
 <body>
+
+<a href="https://github.com/you"><img style="position: absolute; top: 0; left: 0; border: 0; z-index: 1040;" src="https://camo.githubusercontent.com/82b228a3648bf44fc1163ef44c62fcc60081495e/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f6c6566745f7265645f6161303030302e706e67" alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_left_red_aa0000.png"></a>
 
 <div class="navbar navbar-inverse navbar-fixed-top" role="navigation">
     <div class="container">
@@ -21,8 +23,8 @@
         </div>
         <div class="collapse navbar-collapse">
             <form class="navbar-form navbar-right" role="form">
-            <a class="public" href="oauth.html"><button type="button" class="btn btn-success">Login with Sycamore</button></a>
-            <button class="private" type="button" class="btn btn-success">Sign Out</button>
+            <a href="oauth.html"><button type="button" class="btn btn-success public">Login with Sycamore</button></a>
+            <button type="button" class="btn btn-primary private" id="logout">Sign Out</button>
             </form>
         </div><!--/.nav-collapse -->
       </div>
@@ -43,7 +45,7 @@
         </div>
         
     </div><!-- /.container -->
-
+    
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.10.1/jquery.min.js"></script>
 <script type="text/javascript">
 $(document).ready(function() {
@@ -51,13 +53,13 @@ $(document).ready(function() {
     if ( localStorage.getItem('token') ) {
         
         $(".public").css("display", "none");
-        $(".private").css("display", "none");
+        $(".private").css("display", "block");
         
         var me = JSON.parse ( localStorage.getItem("me") );
-        console.log(me);
+        console.log(me.SchoolID);
         
         $.ajax({
-        url: "http://dev.sycamoreeducation.com/api/v1/School/"+school+"/Cafeteria",
+        url: "http://dev.sycamoreeducation.com/api/v1/School/"+me.SchoolID+"/Cafeteria",
         type: "GET",
         datatype: "json",
         processData: false,
@@ -67,15 +69,13 @@ $(document).ready(function() {
         }
         })
         .done(function(data, statusText, xhr){
-            //stringify the object to store in localStorage
-            // NOTE: will need to be JSON.parse'd when referencing it
-            localStorage.setItem("me", JSON.stringify(data) );
-
-            // Uncomment the following line to redirect
-            window.open("index.html", "_self");
+            displayfood(data);
         })
         .fail(function(xhr, statusText, errorThrown) {
             console.log("Failed to connect to API");
+            console.log(statusText);
+            console.log(xhr);
+
         });
     
     }
@@ -87,6 +87,55 @@ $(document).ready(function() {
         $(".public").css("display", "block");
         $(".private ul").empty();
     });
+    
+    function displayfood(data){
+        //console.log(data);
+        
+        var d = new Date();
+        var day = ("0" + d.getDate()).slice(-2);
+        var month = ("0" + (d.getMonth() + 1)).slice(-2); 
+        var year = d.getFullYear();
+
+        var date = month + "/" + day + "/" + year;
+        //console.log("Checking for this date: " + date);
+        var match;
+        
+        $.each(data, function(key, value){
+            //console.log("Comparing " + key + " with " + date);
+            //alert("Key is a " + typeof key); //string
+            //alert("Date is a " + typeof date); //string
+            
+            //console.log("Date lenght: " + date.length); //10
+            //console.log("Key lenght: " + key.length); //10
+            
+            if (key == date) {
+                match = true;
+                console.log("Found a match");
+
+                $("#loggedin h1").html(date);
+                
+                var listitem = "";
+                $.each(value, function(index, meal) {
+                   listitem += "<li><strong>"+meal.MealName+"</strong>";
+                   if(meal.MealDesc) listitem+= " - "+meal.MealDesc+"</li>";
+                });
+                $("#loggedin ul").append(listitem);
+
+                return false;
+            }else{
+                return true;
+            }
+        });
+        
+        if (match == null){
+            nolunchtoday();    
+        }
+        
+    }
+    
+    function nolunchtoday() {
+        $("#loggedin ul").append("<li>No Lunch Listed For Today</li>");
+    }
 
 });
 </script>

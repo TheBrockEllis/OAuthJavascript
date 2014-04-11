@@ -1,4 +1,4 @@
-OAuthJavascriptExample
+Whats For Lunch
 ======================
 
-An example site used to demonstrate how to use OAuth2 with the Sycamore API 
+Example of what the Sycamore School API is capable of

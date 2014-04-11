@@ -3,13 +3,12 @@
     <title>Sycamore OAuth JS Demo</title>
 </head>
 <body>
-    
+
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.10.1/jquery.min.js"></script>
-<script src="sycamore.js"></script>
 <script>
 
-var client_id = "53349dee515d5"; // Replace text in quotes with your API Key
-var callback_uri = "http://SycamoreEducation.github.io/OAuthJavascript/oauth.html";
+var client_id = "534749423854c"; // Replace text in quotes with your API Key
+var callback_uri = "http://127.0.0.1/~TheBrockEllis/WhatsForLunch/oauth.html";
 
 // NOTE: YOU ALSO MUST set Redirect URI for API Key to full home url for this HTML/JS document
 // The Redirect URI provided MUST match the callback_uri value exactly - this is part of the OAuth 2 Standard,
@@ -25,26 +24,26 @@ function parseParams (params) {
         var paramVal = authData[i].split("=",2);
         sycamoreAuth.push(paramVal[1]);
     }
-    
+
     return sycamoreAuth;
 }
 
 // Function to store the access token in the client in a cookie once authentication is completed
 function setCookie(token){
-    document.cookie = "sycamore_auth=" + token;
+    document.cookie = "token=" + token;
     return;
 }
 
 // DEFAULT ACTION
 // Function to store the access token in the client's local (persistent) storage once authentication is completed
 function setLocalStorage(token){
-    localStorage.setItem("sycamore_auth", token);
+    localStorage.setItem("token", token);
     return;
 }
 
 // Function to store the access token in the client's session (temporary) storage once authentication is completed
 function setSessionStorage(token){
-    localStorage.setItem("sycamore_auth", token);
+    localStorage.setItem("token", token);
     return;
 }
 
@@ -57,7 +56,7 @@ if (window.location.hash.length == 0) {
                        'response_type=token'];
     var query = queryParams.join('&');
     var url = path + query;
-    
+
     window.open(url,"_self");
 } else {
     // Else if there is a parameter hash, parse the parameters from it, set a cookie in the client to store the access token, display values in parameter hash, display explanation of what's happening, and link back to PHP Demo application script within 10 seconds.
@@ -68,12 +67,30 @@ if (window.location.hash.length == 0) {
     setLocalStorage(oAuthData[0]);
     //setSessionStorage(oAuthData[0]);
     //setCookie(oAuthData[0]);
-  
-    //hit the /Me endpoint to store specific user details
 
-    // Uncomment the following line to redirect
-    window.open("index.html", "_self");
-   
+    //hit the /Me endpoint to store specific user details
+    $.ajax({
+        url: "http://dev.sycamoreeducation.com/api/v1/Me",
+        type: "GET",
+        datatype: "json",
+        processData: false,
+        beforeSend: function(xhr){
+            var access_token = localStorage.getItem("token");
+            xhr.setRequestHeader('Authorization', 'Bearer '+access_token);
+        }
+     })
+    .done(function(data, statusText, xhr){
+        //stringify the object to store in localStorage
+        // NOTE: will need to be JSON.parse'd when referencing it
+        localStorage.setItem("me", JSON.stringify(data) );
+
+        // Uncomment the following line to redirect
+        window.open("index.html", "_self");
+    })
+    .fail(function(xhr, statusText, errorThrown) {
+        console.log("Failed to connect to API");
+    });
+
 }
 </script>
 </body>

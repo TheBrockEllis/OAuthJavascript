@@ -1,0 +1,35 @@
+body {
+    padding-top: 50px;
+}
+
+.logged {
+    padding: 40px 15px;
+    text-align: center;
+}
+
+#unloggedin {
+    display: block;
+}
+
+#loggedin {
+    display: none;
+}
+
+#results {
+    text-align: center;
+}
+
+#logout {
+    display: none;
+}
+
+#fetch_me {
+    display: none;
+    margin: 0 auto;
+    margin-top: 15px;
+}
+
+pre {
+    margin: 25px;
+    display: none;
+}

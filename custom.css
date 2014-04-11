@@ -7,26 +7,16 @@ body {
     text-align: center;
 }
 
-#unloggedin {
+.public {
     display: block;
 }
 
-#loggedin {
+.private {
     display: none;
 }
 
 #results {
     text-align: center;
-}
-
-#logout {
-    display: none;
-}
-
-#fetch_me {
-    display: none;
-    margin: 0 auto;
-    margin-top: 15px;
 }
 
 pre {

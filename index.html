@@ -21,20 +21,27 @@
         </div>
         <div class="collapse navbar-collapse">
             <form class="navbar-form navbar-right" role="form">
-            <a id="login" href="oauth.html"><button type="button" class="btn btn-success">Login with Sycamore</button></a>
-            <button type="button" class="btn btn-success" id="logout">Sign Out</button>
+            <a class="public" href="oauth.html"><button type="button" class="btn btn-success">Login with Sycamore</button></a>
+            <button class="private" type="button" class="btn btn-success">Sign Out</button>
             </form>
         </div><!--/.nav-collapse -->
       </div>
     </div>
 
     <div class="container">
-        <div class="logged" id="unloggedin">
+        
+        <div class="logged public">
             <img src="logo.jpg" title="WhatsForLunch?" id="logo" />
             <h1>WhatsForLunch?</h1>
             <p class="lead">Log in to see whats for lunch today!</p>
         </div>
-        <div class="logged" id="loggedin"></div>
+        
+        <div class="logged private" id="loggedin">
+            <img src="logo.jpg" title="WhatsForLunch?" id="logo" />
+            <h1></h1>
+            <ul></ul>
+        </div>
+        
     </div><!-- /.container -->
 
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.10.1/jquery.min.js"></script>
@@ -42,20 +49,43 @@
 $(document).ready(function() {
     //check to see if the access token is present in local storage
     if ( localStorage.getItem('token') ) {
-        $("#login").css("display", "none");
-        $("#logout").css("display", "block");
+        
+        $(".public").css("display", "none");
+        $(".private").css("display", "none");
+        
+        var me = JSON.parse ( localStorage.getItem("me") );
+        console.log(me);
+        
+        $.ajax({
+        url: "http://dev.sycamoreeducation.com/api/v1/School/"+school+"/Cafeteria",
+        type: "GET",
+        datatype: "json",
+        processData: false,
+        beforeSend: function(xhr){
+            var access_token = localStorage.getItem("token");
+            xhr.setRequestHeader('Authorization', 'Bearer '+access_token);
+        }
+        })
+        .done(function(data, statusText, xhr){
+            //stringify the object to store in localStorage
+            // NOTE: will need to be JSON.parse'd when referencing it
+            localStorage.setItem("me", JSON.stringify(data) );
 
-        $("#results").prepend("Your Access Token is: " + localStorage.getItem("token") );
-
-        $("#fetch_me").css("display", "block");
+            // Uncomment the following line to redirect
+            window.open("index.html", "_self");
+        })
+        .fail(function(xhr, statusText, errorThrown) {
+            console.log("Failed to connect to API");
+        });
+    
     }
 
     //when logging out, clear access token and present login button
     $("#logout").click(function(){
         localStorage.clear();
-        $("#login").css("display", "block");
-        $("#logout").css("display", "none");
-        $("#results").empty();
+        $(".private").css("display", "none");
+        $(".public").css("display", "block");
+        $(".private ul").empty();
     });
 
 });

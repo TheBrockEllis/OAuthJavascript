@@ -65,17 +65,20 @@ $(document).ready(function() {
             processData: false,
             beforeSend: function(xhr){
                 var access_token = localStorage.getItem("token");
-                xhr.setRequestHeader('Authorization', 'Bearer '+access_token);
+                xhr.setRequestHeader('Authorization', 'Bearer ' + access_token);
             }
         })
         .done(function(data, statusText, xhr){
-            displayfood(data);
+			//if API returns 204 No Content, display no lunch
+			if (xhr.status == 204) {
+				nolunchtoday();    
+			}
+			displayfood(data);
         })
         .fail(function(xhr, statusText, errorThrown) {
             //console.log("Failed to connect to API");
             //console.log(statusText);
             //console.log(xhr);
-
         });
     
     }
@@ -98,7 +101,7 @@ $(document).ready(function() {
 
         var date = month + "/" + day + "/" + year;
         //console.log("Checking for this date: " + date);
-        var match;
+        var match = null;
         
         $.each(data, function(key, value){
             //console.log("Comparing " + key + " with " + date);
